@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apoio Emocional</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-light: #f7f9fc;
+      --bg-dark: #1a1a1a;
+      --text-light: #1a1a1a;
+      --text-dark: #f0f0f0;
+      --accent: #5e60ce;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background 0.5s, color 0.5s;
+    }
+
+    body.light {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .toggle-mode {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--accent);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      z-index: 999;
+    }
+
+    header {
+      padding: 40px;
+      text-align: center;
+    }
+
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .category {
+      flex: 1 1 200px;
+      padding: 20px;
+      border-radius: 15px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      transition: transform 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .category:hover {
+      transform: scale(1.05);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgb(0, 0, 0);
+      backdrop-filter: blur(6px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .popup {
+      background: rgb(255, 255, 255);
+      padding: 30px;
+      max-width: 500px;
+      border-radius: 20px;
+      color: black;
+      position: relative;
+    }
+
+    .popup button {
+      margin-top: 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .close-popup {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .journal, .memories {
+      margin: 40px auto;
+      width: 80%;
+      background: rgb(255, 255, 255);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgb(0, 0, 0);
+    }
+
+    textarea {
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
+      border: none;
+      resize: none;
+      height: 120px;
+    }
+
+    .entries, .memories-list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 20px;
+      padding-right: 10px;
+      text-emphasis-color: #000;
+    }
+
+    .entry {
+      background: #868686;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .delete-entry {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: red;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body class="light">
+  <button class="toggle-mode" onclick="toggleMode()">Modo Escuro/Claro</button>
+  <header>
+    <h1>Autoajuda & Apoio Emocional</h1>
+    <p>Clique em uma categoria para ver mais informações</p>
+  </header>
+
+  <div class="categories" id="categories"></div>
+
+  <div class="overlay" id="overlay">
+    <div class="popup">
+      <span class="close-popup" onclick="closePopup()">&times;</span>
+      <h2 id="popup-title"></h2>
+      <p id="popup-content"></p>
+      <p><strong>Ligue 188 (CVV) se precisar conversar agora.</strong></p>
+    </div>
+  </div>
+
+  <div class="journal">
+    <h2>Desabafe aqui</h2>
+    <textarea id="entryText" placeholder="Fale sobre seu dia..."></textarea>
+    <button onclick="saveEntry()">Salvar</button>
+    <div class="entries" id="entryList"></div>
+  </div>
+
+  <div class="memories">
+    <h2>Memórias</h2>
+    <div class="memories-list" id="memoriesList"></div>
+  </div>
+
+  <script>
+    const categories = [
+      { name: "Depressão", icon: "fa-solid fa-cloud-rain", description: "Estado persistente de tristeza profunda e desmotivação.", solutions: "Procure psicoterapia, rotina saudável e rede de apoio." },
+      { name: "Ansiedade", icon: "fa-solid fa-bolt", description: "Sensação intensa de medo, preocupação ou tensão.", solutions: "Respiração, exercícios físicos e terapia cognitivo-comportamental ajudam." },
+      { name: "Autocobrança", icon: "fa-solid fa-scale-balanced", description: "Exigir demais de si mesmo.", solutions: "Trabalhe autocompaixão e limites realistas." },
+      { name: "Autoinsuficiência", icon: "fa-solid fa-ban", description: "Sensação de nunca ser bom o bastante.", solutions: "Diálogo interno positivo e reforço de conquistas ajudam." },
+      { name: "Baixa autoestima", icon: "fa-solid fa-heart-crack", description: "Falta de valorização pessoal.", solutions: "Liste qualidades, procure elogiar-se e aceite vulnerabilidades." },
+      { name: "Problemas familiares", icon: "fa-solid fa-house-crack", description: "Conflitos no ambiente doméstico.", solutions: "Terapia familiar ou espaços neutros de diálogo ajudam." },
+      { name: "Choro excessivo", icon: "fa-solid fa-droplet", description: "Choro frequente sem razão clara.", solutions: "Avalie gatilhos emocionais e busque apoio profissional." },
+      { name: "Automutilação", icon: "fa-solid fa-scissors", description: "Ato de causar dor física para aliviar dor emocional.", solutions: "Busque ajuda urgente, existem técnicas alternativas seguras." },
+      { name: "Crise de pânico", icon: "fa-solid fa-heartbeat", description: "Ataques repentinos de medo intenso.", solutions: "Foco na respiração e técnicas de aterramento ajudam." },
+      { name: "Ideologias suicidas", icon: "fa-solid fa-skull-crossbones", description: "Pensamentos sobre tirar a própria vida.", solutions: "Procure ajuda profissional imediatamente. Ligue 188." },
+      { name: "Bullying", icon: "fa-solid fa-user-slash", description: "Violência psicológica, física ou verbal repetida.", solutions: "Converse com alguém de confiança e procure suporte jurídico/escolar." },
+      { name: "Estresse", icon: "fa-solid fa-fire", description: "Estado de tensão física e mental.", solutions: "Identifique estressores, faça pausas e cuide da saúde." },
+    ];
+
+    const categoriesContainer = document.getElementById("categories");
+    const overlay = document.getElementById("overlay");
+    const popupTitle = document.getElementById("popup-title");
+    const popupContent = document.getElementById("popup-content");
+
+    categories.forEach(cat => {
+      const div = document.createElement("div");
+      div.className = "category";
+      div.innerHTML = `<i class="${cat.icon}"></i> ${cat.name}`;
+      div.onclick = () => {
+        popupTitle.textContent = cat.name;
+        popupContent.innerHTML = `<strong>O que é:</strong> ${cat.description}<br><br><strong>Soluções:</strong> ${cat.solutions}`;
+        overlay.style.display = "flex";
+      };
+      categoriesContainer.appendChild(div);
+    });
+
+    function closePopup() {
+      overlay.style.display = "none";
+    }
+
+    function toggleMode() {
+      document.body.classList.toggle("dark");
+      document.body.classList.toggle("light");
+    }
+
+    function saveEntry() {
+      const text = document.getElementById("entryText").value.trim();
+      if (!text) return;
+      const date = new Date();
+      const now = date.getTime();
+      const entry = { text, date: now };
+      const data = JSON.parse(localStorage.getItem("entries") || "[]");
+      data.push(entry);
+      localStorage.setItem("entries", JSON.stringify(data));
+      document.getElementById("entryText").value = "";
+      renderEntries();
+    }
+
+    function renderEntries() {
+      const data = JSON.parse(localStorage.getItem("entries") || "[]");
+      const week = 1000 * 60 * 60 * 24 * 7;
+      const now = new Date().getTime();
+      const recent = [];
+      const old = [];
+
+      data.forEach(entry => {
+        if (now - entry.date < week) recent.push(entry);
+        else old.push(entry);
+      });
+
+      const entryList = document.getElementById("entryList");
+      entryList.innerHTML = "";
+      recent.forEach((entry, i) => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.innerHTML = `${entry.text} <button class='delete-entry' onclick='deleteEntry(${i})'>&times;</button>`;
+        entryList.appendChild(div);
+      });
+
+      const memoriesList = document.getElementById("memoriesList");
+      memoriesList.innerHTML = "";
+      old.forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.textContent = entry.text;
+        memoriesList.appendChild(div);
+      });
+    }
+
+    function deleteEntry(index) {
+      const data = JSON.parse(localStorage.getItem("entries") || "[]");
+      data.splice(index, 1);
+      localStorage.setItem("entries", JSON.stringify(data));
+      renderEntries();
+    }
+
+    renderEntries();
+  </script>
+</body>
+
+</html>
