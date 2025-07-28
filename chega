@@ -9,11 +9,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --bg-light: #f7f9fc;
+      --bg-light: #f2e6ee;
       --bg-dark: #1a1a1a;
       --text-light: #1a1a1a;
-      --text-dark: #f0f0f0;
-      --accent: #5e60ce;
+      --text-dark: #052659;
+      --accent: #00033d;
     }
 
     body {
@@ -91,7 +91,7 @@
     }
 
     .popup {
-      background: rgb(255, 255, 255);
+      background: #f2e6ee;
       padding: 30px;
       max-width: 500px;
       border-radius: 20px;
@@ -128,7 +128,7 @@
 
     textarea {
       width: 100%;
-      padding: 15px;
+      padding: 10px;
       border-radius: 10px;
       border: none;
       resize: none;
@@ -144,7 +144,7 @@
     }
 
     .entry {
-      background: #868686;
+      background: #5174ff;
       margin-bottom: 10px;
       padding: 10px;
       border-radius: 10px;
@@ -291,3 +291,4 @@
 </body>
 
 </html>
+
